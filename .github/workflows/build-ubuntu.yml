@@ -9,7 +9,6 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - name: build-ubuntu
-          uses: actions/checkout@v4
           run: |
             apt install wget xz-utils python3 llvm -y
             wget --no-verbose --show-progress --progress=bar:force:noscroll https://download.qt.io/archive/qt/5.15/5.15.2/single/qt-everywhere-src-5.15.2.tar.xz
