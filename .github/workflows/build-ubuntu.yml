@@ -1,9 +1,6 @@
 name: build-ubuntu
 
 on:
-    push:
-      branches:
-        - main
     pull_request:
       branches:
         - main
@@ -11,19 +8,25 @@ jobs:
     build-ubuntu:
       runs-on: ubuntu-latest
       steps:
-        - name: build-ubuntu
+        - name: setup-env
           run: |
             sudo apt install wget xz-utils python3 llvm -y
-            git clone https://github.com/qt/qt5 --branch 5.15.2
-            cd qt5
-            git clone https://github.com/qt/qtbase --branch 5.15
-            git clone https://github.com/qt/qtdeclarative --branch 5.15
-            git clone https://github.com/qt/qtsvg --branch 5.15
             sudo apt install build-essential g++-mingw-w64 -y
             sudo update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
             sudo update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
             sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
             sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
-            ./configure -xplatform win32-g++ -device-option CROSS_COMPILE=x86_64-w64-mingw32- -prefix /qt-windows/install -opensource -confirm-license -no-pch -nomake tests -nomake examples -skip qtcharts -skip qtconnectivity -skip qtdatavis3d -skip qtwebengine -skip qtwebsockets -skip qtwebview -skip qt3d -skip qtquick3d -skip qtspeech -skip qtgamepad -no-harfbuzz -skip qtpurchasing -skip qttranslations -skip qtserialport -skip qtlocation -skip activeqt -opengl desktop
+        - name: clone-qt-sources
+            run: |
+            git clone https://github.com/qt/qt5 --branch 5.15.2
+            cd qt5
+            git clone https://github.com/qt/qtbase --branch 5.15
+            git clone https://github.com/qt/qtdeclarative --branch 5.15
+            git clone https://github.com/qt/qtsvg --branch 5.15
+        - name: configure
+            run: |
+            ./configure -xplatform win32-g++ -device-option CROSS_COMPILE=x86_64-w64-mingw32- -prefix /qt-windows/install -opensource -confirm-license -no-pch -nomake tests -nomake examples -skip qtcharts -skip qtconnectivity -skip qtdatavis3d -skip qtwebengine -skip qtwebsockets -skip qtwebview -skip qt3d -skip qtquick3d -skip qtspeech -skip qtgamepad -no-harfbuzz -skip qtpurchasing -skip qttranslations -skip qtserialport -skip qtlocation -skip activeqt -opengl desktop -skip declarative
             sed -i '/qtConfig(d3d12): SUBDIRS += d3d12/c\#qtConfig(d3d12): SUBDIRS += d3d12' qtdeclarative/src/plugins/scenegraph/scenegraph.pro
-            make -j6
+        - name: make
+            run: |
+            make -j8
