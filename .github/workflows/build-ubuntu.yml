@@ -1,9 +1,10 @@
 name: build-ubuntu
-  on:
+
+on:
     push:
       branches:
         - main
-  jobs:
+jobs:
     build-ubuntu:
       runs-on: ubuntu-latest
       steps:
