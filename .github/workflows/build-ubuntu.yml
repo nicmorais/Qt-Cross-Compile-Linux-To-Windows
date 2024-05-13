@@ -17,7 +17,7 @@ jobs:
             sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
             sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
         - name: clone-qt-sources
-            run |
+          run: |
             git clone https://github.com/qt/qt5 --branch 5.15.2
             cd qt5
             git clone https://github.com/qt/qtbase --branch 5.15
