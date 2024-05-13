@@ -14,8 +14,11 @@ jobs:
         - name: build-ubuntu
           run: |
             sudo apt install wget xz-utils python3 llvm -y
-            wget --no-verbose --show-progress --progress=bar:force:noscroll https://download.qt.io/archive/qt/5.15/5.15.2/single/qt-everywhere-src-5.15.2.tar.xz
-            tar -xvf qt-everywhere-src-5.15.2.tar.xz --exclude='qtwebengine' --exclude='qtwebview' --exclude='qtquick3d'
+            git clone https://github.com/qt/qt5 --branch 5.15.2
+            cd qt5
+            git clone https://github.com/qt/qtbase --branch 5.15
+            git clone https://github.com/qt/qtdeclarative --branch 5.15
+            git clone https://github.com/qt/qtsvg --branch 5.15
             sudo apt install build-essential g++-mingw-w64 -y
             sudo update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
             sudo update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
