@@ -1,9 +1,11 @@
-name: build-ubuntu
+name: build-ubuntu-qt5
 
 on:
     pull_request:
       branches:
         - main
+      paths:
+        - 'qt5/*'
 jobs:
     build-ubuntu:
       runs-on: ubuntu-latest
