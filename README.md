@@ -1,4 +1,7 @@
-# Cross-compiling Qt 5 to Windows from Linux
+# Cross-compiling Qt to Windows from Linux
+
+
+## Qt 5.15.2
 
 First of all, download Qt source files:
 
@@ -63,6 +66,36 @@ Because the `./configure` part above was executed with `-prefix $HOME/qt-windows
 make install
 ```
 
+## Qt 6
+
+The Qt framework is now requiring a host build to be pointed when cross compiling. We could get it from the package manager (such as APT), but if the version available there is different from the one we want to cross compile, it may not work.
+
+The safest way to get it done is by buiding Qt 6 targeting the host (Linux) before building it targeting Windows®.
+
+```bash
+sudo apt install build-essential g++-mingw-w64 cmake ninja-build git libgl1-mesa-dev  libglu1-mesa-dev -y
+git clone https://github.com/qt/qt5 --branch 6.5.2 qt6
+cd qt6
+./init-repository --module-subset=essential #you can change this subset if you want to
+mkdir qt6/build
+cd qt6/build
+../configure -prefix ../qt6-linux -no-feature-accessibility -skip qtqa -no-feature-printsupport  -no-feature-linguist -skip qtdoc -no-harfbuzz -nomake tests -nomake examples -no-feature-assistant -no-feature-designer
+cmake --build . --parallel #builds it
+cmake --install . #installs it at '../qt6-linux'
+rm -r * #cleaning the building directory to build it for Windows®
+
+sudo update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
+sudo update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
+sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+
+../configure -platform linux-g++  -xplatform win32-g++ -device-option CROSS_COMPILE=/usr/bin/x86_64-w64-mingw32- -prefix ../qt6-windows/ -qt-host-path ../qt6-linux -opensource -confirm-license -skip qtqa -skip qtdoc -opengl desktop -no-feature-assistant -no-feature-designer -nomake tests -nomake examples -no-harfbuzz -- -DQT_FORCE_BUILD_TOOLS=ON -DCMAKE_TOOLCHAIN_FILE=/mingw-w64-x86_64.cmake
+
+RUN cmake --build . --parallel
+RUN cmake --install . #installs host build to '../qt6-windows'
+```
+
+
 #### Cross compiling your application
 
 Let's say we got an application called `QuickTest`, built with CMake:
@@ -75,7 +108,7 @@ QuickTest/
 └── qml.qrc
 ```
 
-This is how you would cross compile `QuickTest` for Windows:
+This is how you would cross compile `QuickTest` for Windows (make sure to match CMAKE_PREFIX_PATH to your cross compiled Qt for Windows directory):
 
 `cd QuickTest`
 
@@ -123,6 +156,8 @@ Clone this repository:
 Cd:
 
 `cd Qt-Cross-Compile-Linux-To-Windows`
+
+`cd qt6`
 
 Start building the image:
 

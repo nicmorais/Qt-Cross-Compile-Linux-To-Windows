@@ -1,23 +1,25 @@
-FROM ubuntu:jammy
-WORKDIR /qt-windows
-COPY mingw-w64-x86_64.cmake /qt-windows/
+FROM debian:12
+WORKDIR /
+COPY mingw-w64-x86_64.cmake /
 RUN apt update
-RUN apt install wget llvm build-essential g++-mingw-w64 cmake ninja-build git qt6-base-dev -y
-RUN git clone https://github.com/qt/qt5 --branch 6.2.4 qt6
-WORKDIR /qt-windows/qt6
-RUN git clone https://github.com/qt/qtbase --branch 6.2.4
+RUN apt install llvm build-essential g++-mingw-w64 cmake ninja-build git libgl1-mesa-dev  libglu1-mesa-dev -y
+RUN git clone https://github.com/qt/qt5 --branch 6.5.2 qt6
+WORKDIR /qt6
+RUN ./init-repository --module-subset=essential #you can change this subset if you want to
+WORKDIR /qt6/build
+RUN ../configure -prefix /qt6-linux -no-feature-accessibility -skip qtqa -no-feature-printsupport  -no-feature-linguist -skip qtdoc -no-harfbuzz -nomake tests -nomake examples -no-feature-assistant -no-feature-designer
+RUN cmake --build . --parallel
+RUN cmake --install . #installs host build to /qt6-linux
+
 #qt requires posix threads
 RUN update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
 RUN update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
 RUN update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
 RUN update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+RUN rm -r * #cleans build directory
+#windows configuring:
+RUN ../configure -platform linux-g++  -xplatform win32-g++ -device-option CROSS_COMPILE=/usr/bin/x86_64-w64-mingw32- -prefix /qt6-windows/ -qt-host-path /qt6-linux -opensource -confirm-license -skip qtqa -skip qtdoc -opengl desktop -no-feature-assistant -no-feature-designer -nomake tests -nomake examples -no-harfbuzz -- -DQT_FORCE_BUILD_TOOLS=ON -DCMAKE_TOOLCHAIN_FILE=/mingw-w64-x86_64.cmake
 
-RUN ./configure -platform linux-g++  -xplatform win32-g++ -device-option CROSS_COMPILE=/usr/bin/x86_64-w64-mingw32- -prefix /qt-windows/qt6/install -qt-host-path /usr/lib/x86_64-linux-gnu/cmake  -opensource -confirm-license -opengl desktop -no-pch -nomake tests -nomake examples -no-harfbuzz -- -DQT_FORCE_BUILD_TOOLS=ON -DCMAKE_TOOLCHAIN_FILE=/qt-windows/mingw-w64-x86_64.cmake
-
-#hack: this value is not defined in g++-mingw-w64, so we replace it with 0
-#this will break the feature of detecting hotspot networks that require authentication.
-# RUN sed -i 's/NLM_INTERNET_CONNECTIVITY_WEBHIJACK/0x0/g' qtbase/src/plugins/networkinformation/networklistmanager/qnetworklistmanagernetworkinformationbackend.cpp
-
-RUN ninja
-RUN ninja install
+RUN cmake --build . --parallel
+RUN cmake --install . #installs host build to /qt6-windows
 
