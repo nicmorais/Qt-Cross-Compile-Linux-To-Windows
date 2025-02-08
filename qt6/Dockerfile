@@ -2,7 +2,7 @@ FROM debian:12
 WORKDIR /
 COPY mingw-w64-x86_64.cmake /
 RUN apt update
-RUN apt install llvm build-essential g++-mingw-w64 cmake ninja-build git libgl1-mesa-dev  libglu1-mesa-dev -y
+RUN apt install git g++ g++-mingw-w64 cmake ninja-build git libgl1-mesa-dev libglu1-mesa-dev python3 -y
 RUN git clone https://github.com/qt/qt5 --branch 6.5.2 qt6
 WORKDIR /qt6
 RUN ./init-repository --module-subset=essential #you can change this subset if you want to
