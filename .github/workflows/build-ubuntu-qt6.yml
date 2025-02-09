@@ -30,7 +30,7 @@ jobs:
             cd qt6
             mkdir build
             cd build
-            ../configure -prefix /qt6-linux -no-feature-accessibility -skip qtqa -no-pch -no-feature-testlib -no-feature-xml -no-feature-sql -no-feature-printsupport -no-feature-linguist -no-feature-dbus  -skip qtdoc -no-harfbuzz -nomake tests -nomake examples -no-feature-assistant -no-feature-designer -- -Wno-dev
+            ../configure -prefix ../qt6-linux -no-feature-accessibility -skip qtqa -no-pch -no-feature-testlib -no-feature-xml -no-feature-sql -no-feature-printsupport -no-feature-linguist -no-feature-dbus  -skip qtdoc -no-harfbuzz -nomake tests -nomake examples -no-feature-assistant -no-feature-designer -- -Wno-dev
         - name: make-linux
           run: |
             cd qt6/build
@@ -40,7 +40,7 @@ jobs:
         - name: configure-windows
           run: |
             cd qt6/build
-            ../configure -platform linux-g++  -xplatform win32-g++ -device-option CROSS_COMPILE=/usr/bin/x86_64-w64-mingw32- -prefix /qt6-windows/ -qt-host-path /qt6-linux -opensource -confirm-license -skip qtqa -skip qtdoc -opengl desktop -no-feature-assistant -no-pch -no-feature-testlib -no-feature-xml -no-feature-sql -no-feature-linguist -no-feature-dbus -no-feature-printsupport -no-feature-designer -nomake tests -nomake examples -no-harfbuzz -- -DQT_FORCE_BUILD_TOOLS=ON -DCMAKE_TOOLCHAIN_FILE=/mingw-w64-x86_64.cmake
+            ../configure -platform linux-g++  -xplatform win32-g++ -device-option CROSS_COMPILE=/usr/bin/x86_64-w64-mingw32- -prefix ../qt6-windows -qt-host-path ../qt6-linux -opensource -confirm-license -skip qtqa -skip qtdoc -opengl desktop -no-feature-assistant -no-pch -no-feature-testlib -no-feature-xml -no-feature-sql -no-feature-linguist -no-feature-dbus -no-feature-printsupport -no-feature-designer -nomake tests -nomake examples -no-harfbuzz -- -DQT_FORCE_BUILD_TOOLS=ON -DCMAKE_TOOLCHAIN_FILE=/mingw-w64-x86_64.cmake
         - name: make-windows
           run: |
             cd qt6/build
