@@ -1,11 +1,16 @@
 # Cross-compiling Qt to Windows from Linux
 
+**Notice:** I advise you to build Qt on a Docker container instead of building it direcly on your host machine! Skip to [Docker section](#cross-compiling-with-docker).
 
 ## Qt 5.15.2
 
 First of all, download Qt source files:
 
-`wget https://download.qt.io/archive/qt/5.15/5.15.2/single/qt-everywhere-src-5.15.2.tar.xz`
+`git clone https://github.com/qt/qt5 --branch v5.15.2`
+
+Init a repository (you can change the module subset if you want to):
+
+`./init-repository --module-subset=essential`
 
 
 After that, install the building stuff:
@@ -27,14 +32,6 @@ sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw3
 sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
 
 ```
-
-Now, extract the Qt source files:
-
-`tar -xvf qt-everywhere-src-5.15.2.tar.xz`
-
-Cd in there:
-
-`cd qt-everywhere-src-5.15.2`
 
 ### Configuring
 
@@ -66,7 +63,7 @@ Because the `./configure` part above was executed with `-prefix $HOME/qt-windows
 make install
 ```
 
-## Qt 6
+## Qt 6.5.2
 
 The Qt framework is now requiring a host build to be pointed when cross compiling. We could get it from the package manager (such as APT), but if the version available there is different from the one we want to cross compile, it may not work.
 
@@ -94,6 +91,35 @@ sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw3
 RUN cmake --build . --parallel
 RUN cmake --install . #installs host build to '../qt6-windows'
 ```
+
+## Qt 6.11.0
+
+As explained in the section above, you must firstly perform a Linux build of Qt before build Qt for Windows. I think the first step may be optimized if we build even less Qt modules for Linux, but I don't have enough free time available to try.
+
+```bash
+sudo apt install git g++ g++-mingw-w64 cmake ninja-build libclang-dev llvm-dev libgl1-mesa-dev libglu1-mesa-dev python3 -y
+git clone https://github.com/qt/qt5 --branch 6.11.0 qt6
+cd qt6
+#you can change this subset if you want to. here we skip some unnecessary modules
+./init-repository --module-subset=essential,-qtwebengine,-qt3d,-qtdoc,-qtlanguageserver,-qtactiveqt,-qt3d,-qtwebengine,-qtqa
+mkdir qt6/build
+cd qt6/build
+../configure -prefix ../qt6-linux -no-feature-accessibility -skip qtqa -no-feature-printsupport  -no-feature-linguist -skip qtdoc -no-harfbuzz -nomake tests -nomake examples -no-feature-assistant -no-feature-designer
+cmake --build . --parallel #builds it
+cmake --install . #installs it at '../qt6-linux'
+rm -r * #cleaning the building directory to build it for Windows® (be careful when running this command!)
+
+sudo update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
+sudo update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
+sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+
+../configure -platform linux-g++  -xplatform win32-g++ -device-option CROSS_COMPILE=/usr/bin/x86_64-w64-mingw32- -prefix ../qt6-windows/ -qt-host-path ../qt6-linux -opensource -confirm-license -skip qtqa -skip qtdoc -opengl desktop -no-feature-assistant -no-feature-designer -nomake tests -nomake examples -no-harfbuzz -- -DQT_FORCE_BUILD_TOOLS=ON -DCMAKE_TOOLCHAIN_FILE=/mingw-w64-x86_64.cmake
+
+RUN cmake --build . --parallel
+RUN cmake --install . #installs host build to '../qt6-windows'
+```
+
 
 
 #### Cross compiling your application
@@ -164,3 +190,26 @@ Start building the image:
 `sudo docker build .`
 
 This can take 30 minutes, depending on your machine. You can edit the line `RUN make -j8` in the Dockerfile to speed up the process (beware of OOM).
+
+**Tip:**
+
+If you think the final build of Qt for Windows is suitable for your use, but doesn't want to store such large Docker image, you can make use of [Multi-stage builds](https://docs.docker.com/build/building/multi-stage/).
+
+Example:
+
+```Dockerfile
+
+FROM ubuntu:latest AS builder
+
+# command to build Qt goes here
+# ...
+
+
+FROM ubuntu:latest AS final
+
+COPY --from=builder /qt6-windows/ /qt6.11.0-windows
+
+```
+
+The resulting image (final) will contain only the built stuff from the previous image.
+
