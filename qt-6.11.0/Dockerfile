@@ -1,4 +1,4 @@
-FROM ubuntu:latest AS builder
+FROM ubuntu:latest
  
 WORKDIR /
 COPY mingw-w64-x86_64.cmake /
@@ -26,7 +26,7 @@ RUN apt update && \
     -no-harfbuzz \
     -nomake tests \
     -nomake examples \
-   -no-feature-assistant \
+    -no-feature-assistant \
     -no-feature-designer -- -Wno-dev && \
     cmake --build . --parallel && \
     #installs host build to /qt6-linux
