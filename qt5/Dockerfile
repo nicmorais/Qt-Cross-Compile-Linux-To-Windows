@@ -1,9 +1,9 @@
-FROM ubuntu:jammy
+FROM debian:bullseye
 WORKDIR /qt-windows
 
 #qt requires posix threads
-RUN apt update && \
-    apt install wget xz-utils python3 llvm -y build-essential g++-mingw-w64 git -y -q && \
+RUN apt update -qq && \
+    apt install wget xz-utils python3 llvm -y build-essential g++-mingw-w64 git -y -qq && \
     update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix && \
     update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix && \
     update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix && \
