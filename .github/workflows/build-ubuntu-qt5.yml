@@ -1,14 +1,20 @@
+name: build-qt5
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
 stages:
   - build
 
-build-docker-image:
-  stage: build
-  image: docker:27
-  services:
-    - docker:29.7.0-dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-  script:
-    - docker version
-    - docker build -f qt5/Dockerfile .
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Qt5 Docker image
+        run: |
+          docker version
+          docker build -f qt5/Dockerfile .
