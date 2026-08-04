@@ -1,4 +1,4 @@
-FROM ubuntu:latest AS builder
+FROM ubuntu:latest
  
 WORKDIR /
 COPY mingw-w64-x86_64.cmake /
@@ -26,7 +26,7 @@ RUN apt update && \
     -no-harfbuzz \
     -nomake tests \
     -nomake examples \
-   -no-feature-assistant \
+    -no-feature-assistant \
     -no-feature-designer -- -Wno-dev && \
     cmake --build . --parallel && \
     #installs host build to /qt6-linux
@@ -61,7 +61,6 @@ RUN update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc
     -nomake tests \
     -nomake examples \
     -no-harfbuzz -- -DQT_FORCE_BUILD_TOOLS=ON -DCMAKE_TOOLCHAIN_FILE=/mingw-w64-x86_64.cmake && \
-    #hack, because netlistmgr.h on linux lacks this
-    sed -i 's/NLM_INTERNET_CONNECTIVITY_WEBHIJACK/0x1/g' ../qtbase/src/plugins/networkinformation/networklistmanager/qnetworklistmanagerevents.cpp && \
+    sed -i 's/NLM_INTERNET_CONNECTIVITY_WEBHIJACK/0x1/g' ../qtbase/src/plugins/networkinformation/networklistmanager/qnetworklistmanagerevents.cpp && \ #hack, because netlistmgr.h on linux lacks this
     cmake --build . --parallel && \
     cmake --install . #installs host build to /qt6-windows
