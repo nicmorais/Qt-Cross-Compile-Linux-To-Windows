@@ -1,14 +1,6 @@
 stages:
   - build
 
-on:
-    pull_request:
-      branches:
-        - main
-      paths:
-        - 'qt5/*'
-        - '.github/workflows/build-ubuntu-qt5.yml'
-
 build-docker-image:
   stage: build
   image: docker:27
