@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM ubuntu:jammy
 WORKDIR /qt-windows
 
 #qt requires posix threads
