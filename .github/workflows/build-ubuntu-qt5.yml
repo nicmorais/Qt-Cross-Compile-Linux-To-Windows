@@ -1,20 +1,17 @@
-name: build-qt5
+name: build-ubuntu-qt5
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-
-stages:
-  - build
+    pull_request:
+        types: [opened, synchronize, reopened]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Qt5 Docker image
+      - name: Build Docker image
         run: |
           docker version
           docker build -f qt5/Dockerfile .
