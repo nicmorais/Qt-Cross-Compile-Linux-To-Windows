@@ -29,11 +29,9 @@ RUN apt update -yqq && \
     -no-feature-assistant \
     -no-feature-designer -- -Wno-dev && \
     cmake --build . --parallel && \
-    #installs host build to /qt6-linux
-    cmake --install .
+    cmake --install . #installs host build to /qt6-linux
 
-     #qt requires posix threads
-RUN update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix && \
+RUN update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix && \ #qt requires posix threads
     update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix && \
     update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix && \
     update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix && \
@@ -61,5 +59,6 @@ RUN update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc
     -nomake tests \
     -nomake examples \
     -no-harfbuzz -- -DQT_FORCE_BUILD_TOOLS=ON -DCMAKE_TOOLCHAIN_FILE=/mingw-w64-x86_64.cmake && \
-    cmake --build . --parallel --log-level=WARNING -Wno-dev -DCMAKE_RULE_MESSAGES=OFF && \
+    sed -i 's/NLM_INTERNET_CONNECTIVITY_WEBHIJACK/0x1/g' ../qtbase/src/plugins/networkinformation/networklistmanager/qnetworklistmanagerevents.cpp && \ #hack, because netlistmgr.h on linux lacks this
+    cmake --build . --parallel && \
     cmake --install . #installs host build to /qt6-windows
