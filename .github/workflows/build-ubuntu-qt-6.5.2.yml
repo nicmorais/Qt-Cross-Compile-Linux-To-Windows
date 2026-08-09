@@ -1,8 +1,8 @@
 name: build-ubuntu-qt-6.5.2
 
 on:
-    pull_request:
-        types: [opened, synchronize, reopened]
+  pull_request:
+    types: [opened, synchronize, reopened]
     paths:
       - 'qt-6.5.2/**'
 
