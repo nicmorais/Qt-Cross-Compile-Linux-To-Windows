@@ -5,6 +5,7 @@ on:
     types: [opened, synchronize, reopened]
     paths:
       - 'qt-6.5.2/**'
+      - '.github/workflows/build-ubuntu-qt-6.5.2.yml'
 
 jobs:
   build-qt-6.5.2:
