@@ -61,6 +61,6 @@ RUN update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc
     -nomake tests \
     -nomake examples \
     -no-harfbuzz -- -DQT_FORCE_BUILD_TOOLS=ON -DCMAKE_TOOLCHAIN_FILE=/mingw-w64-x86_64.cmake && \
-    sed -i 's/NLM_INTERNET_CONNECTIVITY_WEBHIJACK/0x1/g' ../qtbase/src/plugins/networkinformation/networklistmanager/qnetworklistmanagerevents.cpp && \ #hack, because netlistmgr.h on linux lacks this
+    sed -i 's/NLM_INTERNET_CONNECTIVITY_WEBHIJACK/0x1/g' ../qtbase/src/plugins/networkinformation/networklistmanager/qnetworklistmanagerevents.cpp && \
     cmake --build . --parallel && \
     cmake --install . #installs host build to /qt6-windows
