@@ -3,6 +3,8 @@ name: build-ubuntu-qt5
 on:
     pull_request:
         types: [opened, synchronize, reopened]
+    paths:
+      - 'qt5/**'
 
 jobs:
   build:

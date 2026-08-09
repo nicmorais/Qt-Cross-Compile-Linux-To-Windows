@@ -1,11 +1,11 @@
 FROM ubuntu:jammy
- 
+
 WORKDIR /
 COPY mingw-w64-x86_64.cmake /
- 
+
 RUN apt update -yqq && \
     apt install git g++ g++-mingw-w64 cmake ninja-build libclang-dev llvm-dev libgl1-mesa-dev libglu1-mesa-dev python3 -yqq && \
-    git clone https://github.com/qt/qt5 --branch 6.11.0 qt6 && \
+    git clone https://github.com/qt/qt5 --branch 6.5.2 qt6 && \
     cd /qt6 && \
     #you can change this subset if you want to
     ./init-repository --module-subset=essential,-qtwebengine,-qt3d,-qtdoc,-qtlanguageserver,-qtactiveqt,-qt3d,-qtwebengine,-qtqa && \
@@ -29,10 +29,8 @@ RUN apt update -yqq && \
     -no-feature-assistant \
     -no-feature-designer -- -Wno-dev && \
     cmake --build . --parallel && \
-    #installs host build to /qt6-linux
-    cmake --install .
- 
-     #qt requires posix threads
+    cmake --install . #installs host build to /qt6-linux
+
 RUN update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix && \
     update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix && \
     update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix && \

@@ -1,0 +1,20 @@
+name: build-ubuntu-qt-6.5.2
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'qt-6.5.2/**'
+      - '.github/workflows/build-ubuntu-qt-6.5.2.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker version
+          docker build -f qt-6.5.2/Dockerfile qt-6.5.2/
