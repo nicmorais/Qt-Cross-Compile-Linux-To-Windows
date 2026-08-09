@@ -1,10 +1,10 @@
-FROM ubuntu:latest
+FROM ubuntu:jammy
  
 WORKDIR /
 COPY mingw-w64-x86_64.cmake /
  
-RUN apt update && \
-    apt install git g++ g++-mingw-w64 cmake ninja-build libclang-dev llvm-dev libgl1-mesa-dev libglu1-mesa-dev python3 -y && \
+RUN apt update -yqq && \
+    apt install git g++ g++-mingw-w64 cmake ninja-build libclang-dev llvm-dev libgl1-mesa-dev libglu1-mesa-dev python3 -yqq && \
     git clone https://github.com/qt/qt5 --branch 6.11.0 qt6 && \
     cd /qt6 && \
     #you can change this subset if you want to
@@ -61,6 +61,6 @@ RUN update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc
     -nomake tests \
     -nomake examples \
     -no-harfbuzz -- -DQT_FORCE_BUILD_TOOLS=ON -DCMAKE_TOOLCHAIN_FILE=/mingw-w64-x86_64.cmake && \
-    sed -i 's/NLM_INTERNET_CONNECTIVITY_WEBHIJACK/0x1/g' ../qtbase/src/plugins/networkinformation/networklistmanager/qnetworklistmanagerevents.cpp && \ #hack, because netlistmgr.h on linux lacks this
-    cmake --build . --parallel && \
+    sed -i 's/NLM_INTERNET_CONNECTIVITY_WEBHIJACK/0x1/g' ../qtbase/src/plugins/networkinformation/networklistmanager/qnetworklistmanagerevents.cpp && \
+    cmake --build . --parallel --log-level=WARNING -Wno-dev -DCMAKE_RULE_MESSAGES=OFF && \
     cmake --install . #installs host build to /qt6-windows
